@@ -14,14 +14,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.weathertest.Utiles.CastLatXLongY;
-import com.example.weathertest.Utiles.GeocodeUtil;
 import com.example.weathertest.Utiles.ResultByValue;
 import com.example.weathertest.databinding.ActivityMainBinding;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
