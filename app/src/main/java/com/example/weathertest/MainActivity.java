@@ -3,6 +3,7 @@ package com.example.weathertest;
 import static com.example.weathertest.Utiles.CastLatXLongY.TO_GRID;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.location.Address;
 import android.location.Geocoder;
@@ -219,6 +220,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //강수 확률
             case "POP":
                 changeValue = "강수확률 : " + item.getFcstValue() + "%";
+                if (!item.getFcstValue().equals("0")){
+                    binding.tvUmbrella.setText("우산 챙기세요 !!");
+                    binding.ivUmbrella.setImageResource(R.drawable.ic_umbrella);
+                } else {
+                    binding.tvUmbrella.setText("우산 챙기지 않으셔도 됩니다");
+                    binding.tvUmbrella.setTextColor(Color.WHITE);
+                    binding.ivUmbrella.setImageResource(R.drawable.ic_sun);
+                }
                 break;
 
             // 강수량
