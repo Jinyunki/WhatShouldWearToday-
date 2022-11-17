@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String addressChange = getAddress(getApplicationContext(), changeLat, changeLon);
                 binding.tvWeatherClick.setText(addressChange);
                 loadWeather(changeLat,changeLon);
+                binding.etAddress.setText("");
                 break;
         }
     }

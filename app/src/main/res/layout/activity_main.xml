@@ -82,7 +82,8 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:hint="주소를 입력해 주세요"
-            android:background="@color/white"/>
+            android:background="@color/white"
+            android:singleLine="true"/>
 
         <TextView
             android:id="@+id/btSearch"
