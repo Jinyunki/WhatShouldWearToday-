@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case "WSD":
                 double doubleWSD = Double.parseDouble(item.getFcstValue());// 현재 풍속
                 resultByValue = new ResultByValue("WSD", doubleWSD);
-                changeValue = item.getFcstValue() + resultByValue.getResultWSD();
+                changeValue = "풍속 : " + resultByValue.getResultWSD();
                 break;
             //하늘상태
             case "SKY":

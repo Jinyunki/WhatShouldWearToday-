@@ -38,25 +38,25 @@ public class ResultByValue {
             // 풍속
         } else if (category.equals("WSD")) {
             if (categoryResult <=0.2){
-                resultWSD = "m/s 0등급(고요)\n";
+                resultWSD = categoryResult + "m/s 0등급(고요)\n";
             } else if (categoryResult >=0.3 && categoryResult <= 1.5) {
-                resultWSD = "m/s 1등급 (미세)\n";
+                resultWSD = categoryResult + "m/s 1등급 (미세)\n";
             } else if (categoryResult >=1.6 && categoryResult <= 3.3) {
-                resultWSD = "m/s 2등급 (선선)\n";
+                resultWSD = categoryResult + "m/s 2등급 (선선)\n";
             } else if (categoryResult >=3.4 && categoryResult <= 5.4) {
-                resultWSD = "m/s 3등급 (시원)\n";
+                resultWSD = categoryResult + "m/s 3등급 (시원)\n";
             } else if (categoryResult >=5.4 && categoryResult <= 7.9) {
-                resultWSD = "m/s 4등급 (약강풍)\n";
+                resultWSD = categoryResult + "m/s 4등급 (약강풍)\n";
             } else if (categoryResult >=8.0 && categoryResult <= 10.7) {
-                resultWSD = "m/s 5등급 (강풍)\n";
+                resultWSD = categoryResult + "m/s 5등급 (강풍)\n";
             } else if (categoryResult >=10.8 && categoryResult <= 13.8) {
-                resultWSD = "m/s 6등급 (매우강풍)\n";
+                resultWSD = categoryResult + "m/s 6등급 (매우강풍)\n";
             } else if (categoryResult >=13.9 && categoryResult <= 17.1) {
-                resultWSD = "m/s 7등급 (태풍)\n";
+                resultWSD = categoryResult + "m/s 7등급 (태풍)\n";
             } else if (categoryResult >=17.2 && categoryResult <= 20.7) {
-                resultWSD = "m/s 8등급 (강한태풍)\n";
+                resultWSD = categoryResult + "m/s 8등급 (강한태풍)\n";
             } else {
-                resultWSD = "m/s 9등급 (재난)\n";
+                resultWSD = categoryResult + "m/s 9등급 (재난)\n";
             }
         }
 
