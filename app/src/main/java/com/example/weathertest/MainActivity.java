@@ -18,8 +18,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.weathertest.Utiles.CastLatXLongY;
-import com.example.weathertest.Utiles.ResultByValue;
+import com.example.weathertest.data.Clothes;
 import com.example.weathertest.databinding.ActivityMainBinding;
+import com.example.weathertest.manager.ClothesManager;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -40,11 +41,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Calendar cal = Calendar.getInstance();
     private String API_KEY = "2e58C7aUEoFp1ToHIEta1FRXX+5d6ylUGgIF8Jcmakmby5VG7oyAK1CZHrdd2/sVCS1R4U2g+RO+IDnDmP8JJA==";
     private Date nowDate = new Date();
-    private ResultByValue resultByValue;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
     private String base_date = simpleDateFormat.format(nowDate);
-
     private String base_time = new SimpleDateFormat("HH00").format(nowDate);
 
     @Override
@@ -166,9 +165,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case "TMP":
                 changeValue = "현재 기온 : " + item.getFcstValue() + "℃   ";
                 int intTMP = Integer.parseInt(item.getFcstValue());// 현재 온도
-                resultByValue = new ResultByValue("TMP", intTMP);
-                clothesRecommendation(resultByValue.getClothesUrl());
-                binding.tvList.setText("추천 의상 : " + resultByValue.getClothesComment());
+                Clothes clothes = ClothesManager.checkWeatherData(intTMP);
+
+                clothesRecommendation(clothes.getClothesUrl());
+                binding.tvList.setText("추천 의상 : " + clothes.getClothesComment());
                 break;
             case "UUU": //풍속(동서성분) m/s
             case "VVV": //풍속(남북성분) m/s
@@ -179,8 +179,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // 풍속 m/s
             case "WSD":
                 double doubleWSD = Double.parseDouble(item.getFcstValue());// 현재 풍속
-                resultByValue = new ResultByValue("WSD", doubleWSD);
-                changeValue = "풍속 : " + resultByValue.getResultWSD();
+                changeValue = "풍속 : " + ClothesManager.getWindSpeedDesction(doubleWSD);
                 break;
             //하늘상태
             case "SKY":
@@ -271,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return nowAddress;
     }
 
-    //주소로 위도 경도 찾기
+    //주소로 위도 경도 찾기 ( getLocationFromAddress )
     private List<Address> getReverseAddress2(Context mContext, String location) {
         Geocoder geocoder = new Geocoder(mContext, Locale.KOREA);
         List<Address> address = null;
@@ -283,6 +282,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             e.printStackTrace();
         }
+
         return address;
     }
 
