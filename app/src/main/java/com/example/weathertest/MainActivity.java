@@ -2,17 +2,11 @@ package com.example.weathertest;
 
 import static com.example.weathertest.Utiles.CastLatXLongY.TO_GRID;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -20,10 +14,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.weathertest.Utiles.CastLatXLongY;
@@ -78,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.ivWeatherIcon:
                 break;
             case R.id.btSearch:
-                List<Address> list = getReverseAddress2(MainActivity.this, binding.etAddress.getText().toString());
+                List<Address> list = getReverseAddress(MainActivity.this, binding.etAddress.getText().toString());
                 double changeLat = list.get(0).getLatitude();
                 double changeLon = list.get(0).getLongitude();
                 String addressChange = getAddress(getApplicationContext(), changeLat, changeLon);
@@ -276,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //주소로 위도 경도 찾기 ( getLocationFromAddress )
-    private List<Address> getReverseAddress2(Context mContext, String location) {
+    private List<Address> getReverseAddress(Context mContext, String location) {
         Geocoder geocoder = new Geocoder(mContext, Locale.KOREA);
         List<Address> address = null;
         try {
