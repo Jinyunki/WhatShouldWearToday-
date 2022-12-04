@@ -2,11 +2,17 @@ package com.example.weathertest;
 
 import static com.example.weathertest.Utiles.CastLatXLongY.TO_GRID;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -14,7 +20,10 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.weathertest.Utiles.CastLatXLongY;
@@ -41,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Calendar cal = Calendar.getInstance();
     private String API_KEY = "2e58C7aUEoFp1ToHIEta1FRXX+5d6ylUGgIF8Jcmakmby5VG7oyAK1CZHrdd2/sVCS1R4U2g+RO+IDnDmP8JJA==";
     private Date nowDate = new Date();
+    private String temp = "";
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
     private String base_date = simpleDateFormat.format(nowDate);
@@ -52,15 +62,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
         initView();
-
     }
-
+    // View
     private void initView() {
-        binding.ivWeatherIcon.setOnClickListener(MainActivity.this);
         String addressItem = getAddress(getApplicationContext(), lat, lon);
-        binding.tvWeatherClick.setText(addressItem);
-        loadWeather(lat,lon);
+        loadWeather(lat, lon);
+        binding.ivWeatherIcon.setOnClickListener(MainActivity.this);
         binding.btSearch.setOnClickListener(MainActivity.this);
+        binding.tvWeatherClick.setText(addressItem);
     }
 
     @Override
@@ -74,17 +83,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 double changeLon = list.get(0).getLongitude();
                 String addressChange = getAddress(getApplicationContext(), changeLat, changeLon);
                 binding.tvWeatherClick.setText(addressChange);
-                loadWeather(changeLat,changeLon);
+                loadWeather(changeLat, changeLon);
                 binding.etAddress.setText("");
                 break;
         }
     }
 
     // 단기 예보조회 -  제공시간에 맞춰 변환
-    private String timeCheck() throws ParseException {
+    private String timeCheck()  {
         int intTime = Integer.parseInt(base_time); // 0200
         if (intTime < 200) {
-            Date setDate = simpleDateFormat.parse(base_time);
+            Date setDate = null;
+            try {
+                setDate = simpleDateFormat.parse(base_time);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             cal.setTime(setDate);
             cal.add(Calendar.DATE, -1);
             base_time = simpleDateFormat.format("2300");
@@ -109,11 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadWeather(double lat, double lon) {
-        try {
-            timeCheck();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        timeCheck();
         // 격자형 변환
         CastLatXLongY castLatXLongY = new CastLatXLongY(TO_GRID, lat, lon);
         int nx = (int) castLatXLongY.getNx();
@@ -123,12 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
                 if (response.isSuccessful()) {
                     WeatherResponse weatherResponse = response.body();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setWeatherData(weatherResponse.getResponse());
-                        }
-                    });
+                    setWeatherData(weatherResponse.getResponse());
                 } else {
                     int code = response.code();
                     onFailure(call, new Exception("onResponse fail, code: " + code));
@@ -144,24 +149,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // 카테코리 정보 set
     private void setWeatherData(WeatherResponse.Response weatherResponse) {
-        binding.tvWeather.setText("");
+        temp = "";
         for (WeatherResponse.Items.Item item : weatherResponse.body.getItems().getItem()) {
             String value = getValueOfCategory(item);
-            String temp = binding.tvWeather.getText().toString();
             if (temp.isEmpty()) {
                 temp = value;
             } else {
                 temp += (value);
             }
-            binding.tvWeather.setText(temp);
         }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                binding.tvWeather.setText(temp);
+            }
+        });
     }
 
     // api 카테코리 정렬
     private String getValueOfCategory(WeatherResponse.Items.Item item) {
         String changeValue = null;
         switch (item.getCategory()) {
-            //필요함
+            // 현재 기온
             case "TMP":
                 changeValue = "현재 기온 : " + item.getFcstValue() + "℃   ";
                 int intTMP = Integer.parseInt(item.getFcstValue());// 현재 온도
@@ -220,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //강수 확률
             case "POP":
                 changeValue = "강수확률 : " + item.getFcstValue() + "%";
-                if (!item.getFcstValue().equals("0")){
+                if (!item.getFcstValue().equals("0")) {
                     binding.tvUmbrella.setText("우산 챙기세요 !!");
                     binding.ivUmbrella.setImageResource(R.drawable.ic_umbrella);
                 } else {
@@ -253,11 +263,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 if (address != null && address.size() > 0) {
                     String currentLocationAddress = address.get(0).getAddressLine(0).toString(); // 전체 상세주소
-                    String adminArea = address.get(0).getAdminArea(); // 도
-                    String locality = address.get(0).getLocality(); // 시/군/구
-                    String thoroughfare = address.get(0).getThoroughfare(); // 동
-                    String addItem = adminArea + " " + locality + " " + thoroughfare;
-
                     nowAddress = currentLocationAddress;
                 }
             }
@@ -293,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .into(binding.ivWeatherIcon);
     }
 
-    // 검색후 키보드 내림
+    // motion event
     public boolean dispatchTouchEvent(MotionEvent ev) {
         View focusView = getCurrentFocus();
         if (focusView != null) {
